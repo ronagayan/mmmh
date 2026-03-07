@@ -1,22 +1,88 @@
+import { useState, useRef, useCallback } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import FoodGame from './FoodGame'
 
 export default function Layout() {
   const { user, signOut } = useAuth()
   const location = useLocation()
+  const [showGame, setShowGame] = useState(false)
+
+  // ── Secret 7-click easter egg ─────────────────────────────
+  const clickCountRef = useRef(0)
+  const clickTimerRef = useRef(null)
+  const [logoFlash, setLogoFlash] = useState(false)
+  const [clickProgress, setClickProgress] = useState(0) // 0–7
+
+  const handleLogoClick = useCallback((e) => {
+    e.preventDefault() // prevent nav on repeated clicks
+
+    clickCountRef.current += 1
+    const count = clickCountRef.current
+    setClickProgress(Math.min(count, 7))
+
+    // Flash logo on each click
+    setLogoFlash(true)
+    setTimeout(() => setLogoFlash(false), 120)
+
+    if (count >= 7) {
+      // Trigger game!
+      clickCountRef.current = 0
+      setClickProgress(0)
+      clearTimeout(clickTimerRef.current)
+      setShowGame(true)
+      return
+    }
+
+    // Reset counter if no click within 1.2s
+    clearTimeout(clickTimerRef.current)
+    clickTimerRef.current = setTimeout(() => {
+      clickCountRef.current = 0
+      setClickProgress(0)
+    }, 1200)
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[#080d18]/85 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-lg mx-auto flex items-center justify-between px-4 py-3">
-          <NavLink
-            to="/"
-            className="text-2xl font-bold transition-all duration-200 hover:opacity-80"
-            style={{ color: '#f97316', textShadow: '0 0 20px rgba(249,115,22,0.35)' }}
-          >
-            mmmh
-          </NavLink>
+
+          {/* Logo — clickable easter egg */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={handleLogoClick}
+              className="text-2xl font-bold transition-all duration-100 hover:opacity-80 select-none"
+              style={{
+                color: logoFlash ? '#fff' : '#f97316',
+                textShadow: logoFlash
+                  ? '0 0 30px rgba(255,255,255,0.8), 0 0 60px rgba(249,115,22,0.6)'
+                  : '0 0 20px rgba(249,115,22,0.35)',
+                transform: logoFlash ? 'scale(1.12)' : 'scale(1)',
+                transition: 'color 0.1s, text-shadow 0.1s, transform 0.1s',
+              }}
+            >
+              mmmh
+            </button>
+
+            {/* Progress dots — only show after first click */}
+            {clickProgress > 0 && (
+              <div className="absolute -bottom-2.5 left-0 right-0 flex gap-0.5 justify-center">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-1 h-1 rounded-full transition-all duration-100"
+                    style={{
+                      background: i < clickProgress ? '#f97316' : 'rgba(255,255,255,0.15)',
+                      transform: i < clickProgress ? 'scale(1.2)' : 'scale(1)',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="flex items-center gap-3">
             {user?.user_metadata?.avatar_url && (
               <img
@@ -130,6 +196,9 @@ export default function Layout() {
           </NavLink>
         </div>
       </nav>
+
+      {/* Secret Mini Game */}
+      {showGame && <FoodGame onClose={() => setShowGame(false)} />}
     </div>
   )
 }
