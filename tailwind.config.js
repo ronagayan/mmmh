@@ -51,6 +51,14 @@ export default {
           '0%': { transform: 'scale(0)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
+        slideInUp: {
+          '0%': { opacity: '0', transform: 'translateY(24px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideOutDown: {
+          '0%': { opacity: '1', transform: 'translateY(0)' },
+          '100%': { opacity: '0', transform: 'translateY(24px)' },
+        },
       },
       animation: {
         'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
@@ -61,6 +69,8 @@ export default {
         'bounce-dot': 'bounceDot 1s ease-in-out infinite',
         'slide-in-left': 'slideInLeft 0.3s ease-out forwards',
         'dot-expand': 'dotExpand 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        'slide-in-up': 'slideInUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'slide-out-down': 'slideOutDown 0.25s ease-in forwards',
       },
     },
   },

@@ -6,6 +6,7 @@ import NewPost from './pages/NewPost'
 import Messages from './pages/Messages'
 import Conversation from './pages/Conversation'
 import Login from './pages/Login'
+import UpdateBanner from './components/UpdateBanner'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -24,6 +25,7 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   return (
+    <>
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route
@@ -40,5 +42,8 @@ export default function App() {
         <Route path="chat/:id" element={<Conversation />} />
       </Route>
     </Routes>
+    {/* PWA update banner — sits above nav, shown globally */}
+    <UpdateBanner />
+    </>
   )
 }

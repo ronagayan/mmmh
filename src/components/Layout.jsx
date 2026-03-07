@@ -2,11 +2,14 @@ import { useState, useRef, useCallback } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import FoodGame from './FoodGame'
+import OnboardingGuide, { hasSeenOnboarding } from './OnboardingGuide'
+import InstallPWA from './InstallPWA'
 
 export default function Layout() {
   const { user, signOut } = useAuth()
   const location = useLocation()
   const [showGame, setShowGame] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(!hasSeenOnboarding())
 
   // ── Secret 7-click easter egg ─────────────────────────────
   const clickCountRef = useRef(0)
@@ -199,6 +202,12 @@ export default function Layout() {
 
       {/* Secret Mini Game */}
       {showGame && <FoodGame onClose={() => setShowGame(false)} />}
+
+      {/* First-use onboarding (full screen, above everything except game) */}
+      {showOnboarding && <OnboardingGuide onDone={() => setShowOnboarding(false)} />}
+
+      {/* Add to Home Screen prompt */}
+      <InstallPWA />
     </div>
   )
 }
