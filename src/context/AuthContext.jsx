@@ -20,13 +20,21 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
+  const redirectTo = window.location.origin + (import.meta.env.PROD ? '/mmmh/' : '/')
+
   const signInWithGoogle = () => {
     return supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: window.location.origin + '/mmmh/',
-      },
+      options: { redirectTo },
     })
+  }
+
+  const signInWithEmail = (email, password) => {
+    return supabase.auth.signInWithPassword({ email, password })
+  }
+
+  const signUpWithEmail = (email, password) => {
+    return supabase.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } })
   }
 
   const signOut = () => {
@@ -34,7 +42,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut }}>
       {children}
     </AuthContext.Provider>
   )

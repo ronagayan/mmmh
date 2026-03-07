@@ -68,16 +68,29 @@ export default function Feed() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-2xl animate-pulse text-brand-500 font-bold">Loading...</div>
+      <div className="flex flex-col items-center justify-center py-24 gap-3">
+        <div className="flex gap-1" dir="rtl">
+          {['מ', 'מ', 'מ'].map((char, i) => (
+            <span
+              key={i}
+              className="text-4xl font-bold text-brand-500 inline-block animate-bounce-dot"
+              style={{ animationDelay: `${i * 0.18}s` }}
+            >
+              {char}
+            </span>
+          ))}
+        </div>
+        <p className="text-slate-600 text-sm animate-fade-in" style={{ animationDelay: '0.3s', opacity: 0 }}>
+          Loading the goods…
+        </p>
       </div>
     )
   }
 
   if (posts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="text-6xl mb-4">🍽️</div>
+      <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-in-up">
+        <div className="text-6xl mb-5 animate-float">🍽️</div>
         <h2 className="text-xl font-bold text-slate-300 mb-2">No posts yet</h2>
         <p className="text-slate-500">Be the first to share some food!</p>
       </div>
@@ -85,9 +98,15 @@ export default function Feed() {
   }
 
   return (
-    <div className="space-y-6 pb-4">
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} onRated={fetchPosts} onCommented={fetchPosts} />
+    <div className="space-y-5 pb-4">
+      {posts.map((post, i) => (
+        <PostCard
+          key={post.id}
+          post={post}
+          index={i}
+          onRated={fetchPosts}
+          onCommented={fetchPosts}
+        />
       ))}
     </div>
   )

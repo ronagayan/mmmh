@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
+const MIN = -5
+const MAX = 10
+
 export default function RatingSlider({ postId, existingRating, onRated }) {
   const { user } = useAuth()
   const [value, setValue] = useState(existingRating ?? 5)
@@ -24,40 +27,55 @@ export default function RatingSlider({ postId, existingRating, onRated }) {
     setSubmitting(false)
   }
 
-  const getColor = () => {
-    if (value < 0) return 'text-red-400'
-    if (value <= 3) return 'text-orange-400'
-    if (value <= 6) return 'text-yellow-400'
-    return 'text-green-400'
+  const getValueColor = () => {
+    if (value < 0) return '#f87171'
+    if (value <= 3) return '#fb923c'
+    if (value <= 6) return '#facc15'
+    return '#4ade80'
   }
 
+  const trackPercent = ((value - MIN) / (MAX - MIN)) * 100
+  const trackBg = `linear-gradient(to right, ${getValueColor()} ${trackPercent}%, rgba(255,255,255,0.08) ${trackPercent}%)`
+
   return (
-    <div className="flex items-center gap-3">
-      <input
-        type="range"
-        min={-5}
-        max={10}
-        value={value}
-        onChange={(e) => {
-          setValue(Number(e.target.value))
-          setSubmitted(false)
-        }}
-        className="flex-1 accent-brand-500 h-2"
-      />
-      <span className={`font-bold text-lg min-w-[3rem] text-right ${getColor()}`}>
-        {value} מ
-      </span>
-      <button
-        onClick={handleSubmit}
-        disabled={submitting || submitted}
-        className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${
-          submitted
-            ? 'bg-green-600/20 text-green-400'
-            : 'bg-brand-500 text-white hover:bg-brand-600 active:scale-95'
-        }`}
-      >
-        {submitted ? '✓' : submitting ? '...' : 'Rate'}
-      </button>
+    <div className="space-y-2">
+      {/* Value label */}
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-slate-500">Rate this dish</span>
+        <span
+          className="text-xl font-bold transition-colors duration-200"
+          style={{ color: getValueColor() }}
+        >
+          {value > 0 ? `+${value}` : value} מ
+        </span>
+      </div>
+
+      {/* Slider + button */}
+      <div className="flex items-center gap-3">
+        <input
+          type="range"
+          min={MIN}
+          max={MAX}
+          value={value}
+          onChange={(e) => {
+            setValue(Number(e.target.value))
+            setSubmitted(false)
+          }}
+          className="flex-1"
+          style={{ background: trackBg }}
+        />
+        <button
+          onClick={handleSubmit}
+          disabled={submitting || submitted}
+          className={`px-4 py-1.5 rounded-xl text-sm font-semibold transition-all active:scale-95 min-w-[52px] ${
+            submitted
+              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+              : 'bg-brand-500 text-white hover:bg-brand-600 shadow-lg shadow-brand-500/25'
+          }`}
+        >
+          {submitted ? '✓' : submitting ? '…' : 'Rate'}
+        </button>
+      </div>
     </div>
   )
 }

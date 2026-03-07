@@ -3,7 +3,8 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/mmmh/',
+  base: process.env.NODE_ENV === 'production' ? '/mmmh/' : '/',
+  server: { host: '0.0.0.0' },
   plugins: [
     react(),
     VitePWA({
