@@ -3,6 +3,8 @@ create table profiles (
   id uuid references auth.users on delete cascade primary key,
   display_name text,
   avatar_url text,
+  -- ECDH P-256 public key (raw, base64-encoded) used for E2E message encryption
+  public_key text,
   created_at timestamptz default now()
 );
 
@@ -116,6 +118,8 @@ create table messages (
   conversation_id uuid references conversations(id) on delete cascade not null,
   sender_id uuid references profiles(id) on delete cascade not null,
   text text not null check (char_length(text) > 0),
+  -- true = text is AES-GCM ciphertext (base64), false = plaintext
+  encrypted boolean default false,
   created_at timestamptz default now()
 );
 
@@ -139,6 +143,11 @@ create policy "Users can send messages in own conversations"
       and (auth.uid() = c.user1_id or auth.uid() = c.user2_id)
     )
   );
+
+-- ── Migration (run these on an existing database) ───────────────────────────
+-- alter table profiles add column if not exists public_key text;
+-- alter table messages add column if not exists encrypted boolean default false;
+-- ─────────────────────────────────────────────────────────────────────────────
 
 -- Storage bucket for food images
 insert into storage.buckets (id, name, public) values ('food-images', 'food-images', true);

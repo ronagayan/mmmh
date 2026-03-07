@@ -3,6 +3,24 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
+async function validateFood(file) {
+  try {
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result.split(',')[1])
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+    const { data, error } = await supabase.functions.invoke('validate-food', {
+      body: { imageBase64: base64, mimeType: file.type },
+    })
+    if (error) return true // fail open — don't block on function errors
+    return data.isFood
+  } catch {
+    return true // fail open
+  }
+}
+
 export default function NewPost() {
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -11,17 +29,30 @@ export default function NewPost() {
   const [preview, setPreview] = useState(null)
   const [file, setFile] = useState(null)
   const [uploading, setUploading] = useState(false)
+  const [validating, setValidating] = useState(false)
+  const [foodError, setFoodError] = useState('')
 
   const handleFileChange = (e) => {
     const selected = e.target.files?.[0]
     if (!selected) return
     setFile(selected)
     setPreview(URL.createObjectURL(selected))
+    setFoodError('')
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!file) return
+
+    // Validate that the image is food before uploading
+    setValidating(true)
+    const isFood = await validateFood(file)
+    setValidating(false)
+
+    if (!isFood) {
+      setFoodError("That doesn't look like food. Only food photos allowed 🍽️")
+      return
+    }
 
     setUploading(true)
 
@@ -109,13 +140,17 @@ export default function NewPost() {
         className="w-full bg-white/5 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-600 border border-white/8 focus:border-brand-500/60 focus:bg-white/8 focus:outline-none resize-none transition-all"
       />
 
+      {foodError && (
+        <p className="text-red-400 text-sm px-1 animate-fade-in">{foodError}</p>
+      )}
+
       {/* Submit */}
       <button
         type="submit"
-        disabled={!file || uploading}
+        disabled={!file || uploading || validating}
         className="w-full py-3 rounded-xl bg-brand-500 text-white font-semibold hover:bg-brand-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-lg shadow-brand-500/20"
       >
-        {uploading ? 'Posting…' : 'Share'}
+        {validating ? 'Checking…' : uploading ? 'Posting…' : 'Share'}
       </button>
     </form>
   )

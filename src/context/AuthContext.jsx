@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { getOrCreateKeyPair, exportPublicKey } from '../lib/crypto'
 
 const AuthContext = createContext({})
 
@@ -19,6 +20,26 @@ export function AuthProvider({ children }) {
 
     return () => subscription.unsubscribe()
   }, [])
+
+  // When a user logs in, ensure their public key is in the DB so others can
+  // derive the shared E2E encryption key for conversations with them.
+  useEffect(() => {
+    if (!user) return
+    getOrCreateKeyPair()
+      .then(async (keyPair) => {
+        const pubKey = await exportPublicKey(keyPair.publicKey)
+        // Only write if the stored key differs (avoids unnecessary writes)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('public_key')
+          .eq('id', user.id)
+          .single()
+        if (profile?.public_key !== pubKey) {
+          await supabase.from('profiles').update({ public_key: pubKey }).eq('id', user.id)
+        }
+      })
+      .catch(() => {}) // non-fatal — messages fall back to unencrypted
+  }, [user])
 
   const redirectTo = window.location.origin + (import.meta.env.PROD ? '/mmmh/' : '/')
 
