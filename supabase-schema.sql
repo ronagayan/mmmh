@@ -73,6 +73,73 @@ create policy "Users can insert own ratings"
 create policy "Users can update own ratings"
   on ratings for update using (auth.uid() = user_id);
 
+-- Comments table
+create table comments (
+  id uuid default gen_random_uuid() primary key,
+  post_id uuid references posts(id) on delete cascade not null,
+  user_id uuid references profiles(id) on delete cascade not null,
+  text text not null check (char_length(text) > 0),
+  created_at timestamptz default now()
+);
+
+alter table comments enable row level security;
+
+create policy "Comments are viewable by everyone"
+  on comments for select using (true);
+
+create policy "Users can create comments"
+  on comments for insert with check (auth.uid() = user_id);
+
+create policy "Users can delete own comments"
+  on comments for delete using (auth.uid() = user_id);
+
+-- Conversations table (between two users)
+create table conversations (
+  id uuid default gen_random_uuid() primary key,
+  user1_id uuid references profiles(id) on delete cascade not null,
+  user2_id uuid references profiles(id) on delete cascade not null,
+  created_at timestamptz default now(),
+  unique (user1_id, user2_id)
+);
+
+alter table conversations enable row level security;
+
+create policy "Users can view own conversations"
+  on conversations for select using (auth.uid() = user1_id or auth.uid() = user2_id);
+
+create policy "Users can create conversations"
+  on conversations for insert with check (auth.uid() = user1_id or auth.uid() = user2_id);
+
+-- Messages table
+create table messages (
+  id uuid default gen_random_uuid() primary key,
+  conversation_id uuid references conversations(id) on delete cascade not null,
+  sender_id uuid references profiles(id) on delete cascade not null,
+  text text not null check (char_length(text) > 0),
+  created_at timestamptz default now()
+);
+
+alter table messages enable row level security;
+
+create policy "Users can view messages in own conversations"
+  on messages for select using (
+    exists (
+      select 1 from conversations c
+      where c.id = conversation_id
+      and (auth.uid() = c.user1_id or auth.uid() = c.user2_id)
+    )
+  );
+
+create policy "Users can send messages in own conversations"
+  on messages for insert with check (
+    auth.uid() = sender_id and
+    exists (
+      select 1 from conversations c
+      where c.id = conversation_id
+      and (auth.uid() = c.user1_id or auth.uid() = c.user2_id)
+    )
+  );
+
 -- Storage bucket for food images
 insert into storage.buckets (id, name, public) values ('food-images', 'food-images', true);
 

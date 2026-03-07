@@ -3,6 +3,8 @@ import { useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
 import Feed from './pages/Feed'
 import NewPost from './pages/NewPost'
+import Messages from './pages/Messages'
+import Conversation from './pages/Conversation'
 import Login from './pages/Login'
 
 function ProtectedRoute({ children }) {
@@ -34,6 +36,8 @@ export default function App() {
       >
         <Route index element={<Feed />} />
         <Route path="new" element={<NewPost />} />
+        <Route path="messages" element={<Messages />} />
+        <Route path="chat/:id" element={<Conversation />} />
       </Route>
     </Routes>
   )

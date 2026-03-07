@@ -24,6 +24,13 @@ export default function Feed() {
       .select('*, profiles(display_name)')
       .in('post_id', postIds)
 
+    // Fetch comments for all posts
+    const { data: commentsData } = await supabase
+      .from('comments')
+      .select('*, profiles(display_name)')
+      .in('post_id', postIds)
+      .order('created_at', { ascending: true })
+
     // Fetch author profiles
     const authorIds = [...new Set(postsData.map((p) => p.user_id))]
     const { data: profiles } = await supabase
@@ -42,6 +49,12 @@ export default function Feed() {
         .map((r) => ({
           ...r,
           user_name: r.profiles?.display_name || 'Anonymous',
+        })),
+      comments: (commentsData || [])
+        .filter((c) => c.post_id === post.id)
+        .map((c) => ({
+          ...c,
+          user_name: c.profiles?.display_name || 'Anonymous',
         })),
     }))
 
@@ -74,7 +87,7 @@ export default function Feed() {
   return (
     <div className="space-y-6 pb-4">
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} onRated={fetchPosts} />
+        <PostCard key={post.id} post={post} onRated={fetchPosts} onCommented={fetchPosts} />
       ))}
     </div>
   )

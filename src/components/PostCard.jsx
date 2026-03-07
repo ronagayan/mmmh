@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import RatingSlider from './RatingSlider'
 import MemRating from './MemRating'
+import Comments from './Comments'
 import { useAuth } from '../context/AuthContext'
 
-export default function PostCard({ post, onRated }) {
+export default function PostCard({ post, onRated, onCommented }) {
   const { user } = useAuth()
   const [showRating, setShowRating] = useState(false)
 
@@ -59,6 +60,13 @@ export default function PostCard({ post, onRated }) {
             onRated={onRated}
           />
         )}
+
+        {/* Comments */}
+        <Comments
+          postId={post.id}
+          comments={post.comments || []}
+          onCommented={onCommented}
+        />
       </div>
     </div>
   )
