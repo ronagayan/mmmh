@@ -30,14 +30,6 @@ const SLIDES = [
     color: '#3b82f6',
     bg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,130,246,0.14) 0%, transparent 70%)',
   },
-  {
-    emoji: '🤫',
-    title: 'Psst… there\'s a secret',
-    body: 'Something is hidden in the app. Tap the logo a few times fast and see what happens.',
-    color: '#a855f7',
-    bg: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(168,85,247,0.14) 0%, transparent 70%)',
-    isLast: true,
-  },
 ]
 
 const LS_KEY = 'mmmh_onboarded'
