@@ -271,34 +271,6 @@ export default function Layout() {
             )}
           </NavLink>
 
-          {/* Profile */}
-          <NavLink
-            to="/profile"
-            className={({ isActive }) =>
-              `flex-1 flex flex-col items-center py-3 transition-all duration-200 relative ${
-                isActive ? 'text-brand-500' : 'text-slate-600 hover:text-slate-400'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <svg
-                  className={`w-6 h-6 mb-0.5 transition-all duration-200 ${isActive ? 'nav-icon-active scale-110' : ''}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={isActive ? 2.5 : 2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                <span className="text-xs font-medium">{t('nav_profile')}</span>
-                {isActive && (
-                  <span className="absolute bottom-1 w-1 h-1 rounded-full bg-brand-500 animate-dot-expand" />
-                )}
-              </>
-            )}
-          </NavLink>
-
         </div>
       </nav>
 
