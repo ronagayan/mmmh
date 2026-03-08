@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 
@@ -84,7 +85,7 @@ export default function SharePostModal({ post, onClose }) {
   const isSearching = query.length >= 2
   const displayed = isSearching ? searchResults : conversations
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
       <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onClose} />
@@ -138,6 +139,7 @@ export default function SharePostModal({ post, onClose }) {
           })}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   )
 }
