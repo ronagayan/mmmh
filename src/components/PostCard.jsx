@@ -2,7 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import RatingSlider from './RatingSlider'
 import MemRating from './MemRating'
 import Comments from './Comments'
+import RecipeEditor from './RecipeEditor'
 import { useAuth } from '../context/AuthContext'
+import { usePrefs } from '../context/PrefsContext'
 import { supabase } from '../lib/supabase'
 
 const RECIPE_PREFIX = '__recipe__'
@@ -51,10 +53,17 @@ function RecipeCard({ raw }) {
 
 export default function PostCard({ post, onRated, onCommented, onDeleted, index = 0 }) {
   const { user, isAdmin } = useAuth()
+  const { lang } = usePrefs()
+  const mem = lang === 'he' ? 'מ' : 'm'
+  const isRecipePost = post.caption?.startsWith(RECIPE_PREFIX)
   const [showRating, setShowRating] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [editCaption, setEditCaption] = useState(post.caption || '')
+  const [recipeEditData, setRecipeEditData] = useState(() => {
+    if (!post.caption?.startsWith(RECIPE_PREFIX)) return null
+    try { return JSON.parse(post.caption.slice(RECIPE_PREFIX.length)) } catch { return null }
+  })
   const [saving, setSaving] = useState(false)
   const menuRef = useRef(null)
 
@@ -75,10 +84,13 @@ export default function PostCard({ post, onRated, onCommented, onDeleted, index 
 
   async function handleSaveCaption() {
     setSaving(true)
-    const { error } = await supabase.from('posts').update({ caption: editCaption }).eq('id', post.id)
+    const newCaption = isRecipePost && recipeEditData
+      ? `${RECIPE_PREFIX}${JSON.stringify(recipeEditData)}`
+      : editCaption
+    const { error } = await supabase.from('posts').update({ caption: newCaption }).eq('id', post.id)
     setSaving(false)
     if (!error) {
-      post.caption = editCaption
+      post.caption = newCaption
       setEditMode(false)
     }
   }
@@ -153,13 +165,17 @@ export default function PostCard({ post, onRated, onCommented, onDeleted, index 
         {/* Caption / edit mode */}
         {editMode ? (
           <div className="space-y-2">
-            <textarea
-              value={editCaption}
-              onChange={e => setEditCaption(e.target.value)}
-              className="w-full bg-white/5 rounded-xl px-3 py-2 text-sm text-slate-200 border border-white/8 focus:border-brand-500/50 focus:outline-none resize-none"
-              rows={2}
-              autoFocus
-            />
+            {isRecipePost && recipeEditData ? (
+              <RecipeEditor recipe={recipeEditData} onChange={setRecipeEditData} />
+            ) : (
+              <textarea
+                value={editCaption}
+                onChange={e => setEditCaption(e.target.value)}
+                className="w-full bg-white/5 rounded-xl px-3 py-2 text-sm text-slate-200 border border-white/8 focus:border-brand-500/50 focus:outline-none resize-none"
+                rows={2}
+                autoFocus
+              />
+            )}
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => { setEditMode(false); setEditCaption(post.caption || '') }}
@@ -192,8 +208,8 @@ export default function PostCard({ post, onRated, onCommented, onDeleted, index 
             className="w-full py-2 rounded-xl bg-white/5 text-slate-400 hover:text-brand-400 hover:bg-white/10 transition-all text-sm font-medium active:scale-[0.98] border border-white/5 hover:border-brand-500/25"
           >
             {myRating
-              ? `Your rating: ${myRating.rating} מ · Change`
-              : 'Rate this מ'}
+              ? `Your rating: ${myRating.rating} ${mem} · Change`
+              : `Rate this ${mem}`}
           </button>
         ) : (
           <div className="animate-scale-in">

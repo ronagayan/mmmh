@@ -1,10 +1,19 @@
+import { usePrefs } from '../context/PrefsContext'
+
 export default function MemRating({ ratings }) {
+  const { lang } = usePrefs()
+  const mem = lang === 'he' ? 'מ' : 'm'
+
   if (!ratings || ratings.length === 0) return null
 
   const totalRating = ratings.reduce((sum, r) => sum + r.rating, 0)
   const avgRating = totalRating / ratings.length
   const netCount = Math.max(0, totalRating)
-  const netText = 'מ'.repeat(netCount)
+  const netText = mem.repeat(netCount)
+
+  const negText = lang === 'he'
+    ? 'איכ' + 'ס'.repeat(Math.abs(totalRating))
+    : 'e' + 'w'.repeat(Math.abs(totalRating))
 
   const avgColor =
     avgRating < 0
@@ -17,16 +26,16 @@ export default function MemRating({ ratings }) {
 
   return (
     <div className="space-y-1.5">
-      {/* Net מ display */}
+      {/* Net display */}
       <div
         className="text-2xl leading-relaxed tracking-wider break-all font-medium animate-fade-in"
-        dir="rtl"
+        dir={lang === 'he' ? 'rtl' : 'ltr'}
         style={{ opacity: 0 }}
       >
         {netCount > 0 ? (
           <span className="text-brand-400">{netText}</span>
         ) : (
-          <span className="text-red-400">🤮{'מ'.repeat(Math.abs(totalRating))}</span>
+          <span className="text-red-400">{negText}</span>
         )}
       </div>
 
@@ -36,7 +45,7 @@ export default function MemRating({ ratings }) {
         <span className="text-slate-700">·</span>
         <span>avg</span>
         <span className="font-semibold" style={{ color: avgColor }}>
-          {avgRating.toFixed(1)} מ
+          {avgRating.toFixed(1)} {mem}
         </span>
       </div>
     </div>
