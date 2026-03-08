@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { usePrefs } from '../context/PrefsContext'
 
-const CURRENT_VERSION = '1.5.0'
+/* eslint-disable no-undef */
+const CURRENT_VERSION = __GIT_COMMIT__
 const STORAGE_KEY = 'mmmh_whats_new_seen'
 
 export function hasSeenWhatsNew() {
