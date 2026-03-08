@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { escapeIlike } from '../lib/sanitize'
 
 export default function SharePostModal({ post, onClose }) {
   const { user } = useAuth()
@@ -44,7 +45,7 @@ export default function SharePostModal({ post, onClose }) {
     const { data } = await supabase
       .from('profiles')
       .select('id, display_name, avatar_url')
-      .ilike('display_name', `%${q}%`)
+      .ilike('display_name', `%${escapeIlike(q)}%`)
       .neq('id', user.id)
       .limit(5)
     setSearchResults(data || [])
@@ -78,7 +79,7 @@ export default function SharePostModal({ post, onClose }) {
       setTimeout(onClose, 1200)
     } else {
       console.error('Share failed:', error)
-      alert(`Share failed: ${error.code} — ${error.message}`)
+      alert('Failed to share post. Please try again.')
     }
   }
 

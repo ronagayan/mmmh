@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import FollowButton from '../components/FollowButton'
+import { escapeIlike } from '../lib/sanitize'
 
 export default function Explore() {
   const { user } = useAuth()
@@ -29,7 +30,7 @@ export default function Explore() {
     const { data } = await supabase
       .from('profiles')
       .select('id, display_name, avatar_url')
-      .ilike('display_name', `%${q}%`)
+      .ilike('display_name', `%${escapeIlike(q)}%`)
       .neq('id', user.id)
       .limit(20)
     setResults(data || [])

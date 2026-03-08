@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { MAX_COMMENT_LENGTH } from '../lib/sanitize'
 
 export default function Comments({ postId, comments: initialComments, onCommented }) {
   const { user, isAdmin } = useAuth()
@@ -127,6 +128,7 @@ export default function Comments({ postId, comments: initialComments, onCommente
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Add a comment…"
+          maxLength={MAX_COMMENT_LENGTH}
           className="flex-1 bg-white/5 rounded-xl px-3 py-2 text-sm text-slate-200 placeholder-slate-600 border border-white/5 focus:border-brand-500/50 focus:bg-white/8 focus:outline-none transition-all"
         />
         <button

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { escapeIlike } from '../lib/sanitize'
 
 export default function Messages() {
   const { user } = useAuth()
@@ -73,7 +74,7 @@ export default function Messages() {
     const { data } = await supabase
       .from('profiles')
       .select('id, display_name, avatar_url')
-      .ilike('display_name', `%${query}%`)
+      .ilike('display_name', `%${escapeIlike(query)}%`)
       .neq('id', user.id)
       .limit(5)
 

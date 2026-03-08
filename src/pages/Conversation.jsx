@@ -142,7 +142,8 @@ export default function Conversation() {
       // Revert optimistic message and show error
       setMessages((prev) => prev.filter((m) => m.id !== tempId))
       setText(displayText)
-      setSendError(`Failed to send: ${error.code} — ${error.message}`)
+      console.error('Message send failed:', error)
+      setSendError('Failed to send message. Please try again.')
     } else if (data) {
       // Replace temp with real message (realtime may also arrive; dedup handles it)
       const real = { ...data, display: displayText }

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { usePrefs } from '../context/PrefsContext'
 import { supabase } from '../lib/supabase'
+import { validateImageFile, MAX_AVATAR_SIZE } from '../lib/sanitize'
 
 // ── Avatar presets ──────────────────────────────────────────
 const PRESETS = [
@@ -197,6 +198,12 @@ export default function Profile() {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
+    const fileErr = validateImageFile(file, MAX_AVATAR_SIZE)
+    if (fileErr) {
+      alert(fileErr)
+      e.target.value = ''
+      return
+    }
     handleAvatarUpload(file)
     e.target.value = ''
   }

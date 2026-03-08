@@ -3,33 +3,50 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
 import RecipeEditor from '../components/RecipeEditor'
+import { validateImageFile, MAX_CAPTION_LENGTH } from '../lib/sanitize'
 
-async function validateFood(file) {
-  try {
-    const res = await fetch(
-      'https://api-inference.huggingface.co/models/Kaludi/food-not-food-image-classification',
-      { method: 'POST', body: file }
-    )
-    if (!res.ok) return true // network error → allow
-    const result = await res.json()
+const HF_URL = 'https://api-inference.huggingface.co/models/Kaludi/food-not-food-image-classification'
+const MAX_RETRIES = 3
+const RETRY_DELAY = 3000 // ms — HuggingFace cold-start takes ~20s, but we poll
 
-    // Model still loading: {"error": "...", "estimated_time": N}
-    if (!Array.isArray(result)) return true
+async function classifyImage(file) {
+  const res = await fetch(HF_URL, { method: 'POST', body: file })
+  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  const result = await res.json()
 
-    // HuggingFace image classification returns [[{label, score}, ...]]
-    const items = Array.isArray(result[0]) ? result[0] : result
-    if (!items.length) return true
-
-    const food = items.find((r) => r.label?.toLowerCase() === 'food')
-    const notFood = items.find((r) => r.label?.toLowerCase().includes('not'))
-
-    if (food) return food.score > 0.5
-    if (notFood) return notFood.score < 0.5
-    // Fallback: top label contains "food"
-    return items[0]?.label?.toLowerCase().includes('food') ?? true
-  } catch {
-    return true
+  // Model still loading: {"error": "...", "estimated_time": N}
+  if (result?.error && typeof result.estimated_time === 'number') {
+    throw new Error('loading')
   }
+  if (!Array.isArray(result)) throw new Error('unexpected response')
+
+  // HuggingFace returns [[{label, score}, ...]] for image classification
+  const items = Array.isArray(result[0]) ? result[0] : result
+  if (!items.length) throw new Error('empty response')
+
+  const food = items.find((r) => r.label?.toLowerCase() === 'food')
+  const notFood = items.find((r) => r.label?.toLowerCase().includes('not'))
+
+  if (food) return food.score > 0.5
+  if (notFood) return notFood.score < 0.5
+  return items[0]?.label?.toLowerCase().includes('food') ?? false
+}
+
+async function validateFood(file, onStatus) {
+  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    try {
+      return await classifyImage(file)
+    } catch (err) {
+      if (err.message === 'loading' && attempt < MAX_RETRIES - 1) {
+        onStatus?.('Model warming up, retrying…')
+        await new Promise((r) => setTimeout(r, RETRY_DELAY * (attempt + 1)))
+        continue
+      }
+      // On final failure, block the upload to be safe
+      return false
+    }
+  }
+  return false
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
@@ -64,6 +81,11 @@ export default function NewPost() {
   const handleFileChange = (e) => {
     const selected = e.target.files?.[0]
     if (!selected) return
+    const fileErr = validateImageFile(selected)
+    if (fileErr) {
+      setFoodError(fileErr)
+      return
+    }
     setFile(selected)
     setPreview(URL.createObjectURL(selected))
     setFoodError('')
@@ -74,7 +96,8 @@ export default function NewPost() {
     if (!file) return
 
     setValidating(true)
-    const isFood = await validateFood(file)
+    setFoodError('')
+    const isFood = await validateFood(file, (status) => setFoodError(status))
     setValidating(false)
 
     if (!isFood) {
@@ -239,6 +262,7 @@ export default function NewPost() {
           onChange={(e) => setCaption(e.target.value)}
           placeholder="What is this dish?"
           rows={2}
+          maxLength={MAX_CAPTION_LENGTH}
           className="w-full bg-white/5 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-600 border border-white/8 focus:border-brand-500/60 focus:bg-white/8 focus:outline-none resize-none transition-all"
         />
       )}

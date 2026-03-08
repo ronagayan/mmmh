@@ -12,21 +12,28 @@ export default function Feed() {
   const fetchPosts = useCallback(async () => {
     setLoading(true)
 
-    let query = supabase.from('posts').select('*').order('created_at', { ascending: false })
-
-    if (feedMode === 'following' && user) {
+    // Always fetch who the user follows (needed for both feed modes)
+    let followingIds = []
+    if (user) {
       const { data: follows } = await supabase
         .from('follows')
         .select('following_id')
         .eq('follower_id', user.id)
+      followingIds = (follows || []).map((f) => f.following_id)
+    }
 
-      const ids = (follows || []).map((f) => f.following_id)
-      if (ids.length === 0) {
+    let query = supabase.from('posts').select('*').order('created_at', { ascending: false })
+
+    if (feedMode === 'following') {
+      if (followingIds.length === 0) {
         setPosts([])
         setLoading(false)
         return
       }
-      query = query.in('user_id', ids)
+      query = query.in('user_id', followingIds)
+    } else {
+      // "For You" — only public posts (+ own posts)
+      query = query.or(`visibility.eq.public,visibility.is.null${user ? `,user_id.eq.${user.id}` : ''}`)
     }
 
     const { data: postsData } = await query
