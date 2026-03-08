@@ -44,14 +44,14 @@ export default function PostSharePreview({ postId }) {
   return (
     <button
       onClick={() => navigate(`/u/${post.user_id}`)}
-      className="flex gap-2 w-52 rounded-xl overflow-hidden border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left active:scale-[0.98]"
+      className="flex flex-col w-56 rounded-xl overflow-hidden border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-left active:scale-[0.98]"
     >
       <img
         src={post.image_url}
         alt=""
-        className="w-14 h-14 object-cover shrink-0"
+        className="w-full h-36 object-cover"
       />
-      <div className="flex flex-col justify-center py-1.5 pr-2 min-w-0">
+      <div className="flex flex-col px-3 py-2 min-w-0">
         <span className="text-xs font-semibold text-slate-300 truncate">{authorName}</span>
         {captionText && (
           <span className="text-xs text-slate-500 truncate leading-snug mt-0.5">{captionText}</span>

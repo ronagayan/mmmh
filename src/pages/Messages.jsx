@@ -45,7 +45,7 @@ export default function Messages() {
         const otherId = conv.user1_id === user.id ? conv.user2_id : conv.user1_id
         const { data: lastMsg } = await supabase
           .from('messages')
-          .select('text, created_at')
+          .select('text, post_id, created_at')
           .eq('conversation_id', conv.id)
           .order('created_at', { ascending: false })
           .limit(1)
@@ -180,7 +180,7 @@ export default function Messages() {
                 </div>
                 {conv.last_message && (
                   <div className="text-xs text-slate-500 truncate">
-                    {conv.last_message.text}
+                    {conv.last_message.post_id ? '📎 Shared a post' : conv.last_message.text}
                   </div>
                 )}
               </div>

@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import { usePrefs } from '../context/PrefsContext'
 
 const MIN = -5
 const MAX = 10
 
 export default function RatingSlider({ postId, existingRating, onRated }) {
   const { user } = useAuth()
+  const { lang } = usePrefs()
+  const isRTL = lang === 'he'
   const [value, setValue] = useState(existingRating ?? 5)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(existingRating != null)
@@ -35,7 +38,8 @@ export default function RatingSlider({ postId, existingRating, onRated }) {
   }
 
   const trackPercent = ((value - MIN) / (MAX - MIN)) * 100
-  const trackBg = `linear-gradient(to right, ${getValueColor()} ${trackPercent}%, rgba(255,255,255,0.08) ${trackPercent}%)`
+  const direction = isRTL ? 'to left' : 'to right'
+  const trackBg = `linear-gradient(${direction}, ${getValueColor()} ${trackPercent}%, rgba(255,255,255,0.08) ${trackPercent}%)`
 
   return (
     <div className="space-y-2">
