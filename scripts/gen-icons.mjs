@@ -20,7 +20,10 @@ const svgSource = readFileSync(join(root, 'public', 'mmmh.svg'), 'utf8')
 async function render(size, outFile) {
   const resvg = new Resvg(svgSource, {
     fitTo: { mode: 'width', value: size },
-    font: { loadSystemFonts: false },
+    font: {
+      loadSystemFonts: false,
+      fontFiles: [join(__dirname, 'Fredoka-Bold.ttf')],
+    },
   })
   const png = resvg.render()
   const buffer = png.asPng()

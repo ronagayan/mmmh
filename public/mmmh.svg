@@ -1,41 +1,22 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Dark background -->
-  <rect width="512" height="512" rx="112" fill="#080d18"/>
+  <!-- Warm dark brown background -->
+  <rect width="512" height="512" rx="112" fill="#1a0900"/>
 
-  <!-- Subtle orange radial glow -->
-  <radialGradient id="g" cx="50%" cy="55%" r="52%">
-    <stop offset="0%" stop-color="#f97316" stop-opacity="0.22"/>
+  <!-- Subtle orange centre glow -->
+  <radialGradient id="g" cx="50%" cy="52%" r="55%">
+    <stop offset="0%" stop-color="#f97316" stop-opacity="0.20"/>
     <stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
   </radialGradient>
   <rect width="512" height="512" rx="112" fill="url(#g)"/>
 
-  <!--
-    Bold lowercase "m" — path-based (no font required).
-    3 pill stems + 2 cubic-Bézier arches (round humps, not pointed).
-
-    Stem width  : 72 px  (rx=36 → fully semicircular top/bottom)
-    Gap         : 82 px
-    Total width : 3×72 + 2×82 = 380 px  → left x = 66
-    Stem centers: x = 102, 256, 410
-    Stem tops   : y = 188
-    Stem bottoms: y = 418  (height 230 px)
-    Arch handles: y = 108  (80 px above stem tops → smooth round hump)
-  -->
-
-  <!-- Left arch — cubic Bézier with vertical handles = round hump -->
-  <path d="M 102,188 C 102,108 256,108 256,188"
-        stroke="#f97316" stroke-width="72" stroke-linecap="round" fill="none"/>
-
-  <!-- Right arch -->
-  <path d="M 256,188 C 256,108 410,108 410,188"
-        stroke="#f97316" stroke-width="72" stroke-linecap="round" fill="none"/>
-
-  <!-- Stem 1 (left) -->
-  <rect x="66"  y="188" width="72" height="230" rx="36" fill="#f97316"/>
-
-  <!-- Stem 2 (middle) -->
-  <rect x="220" y="188" width="72" height="230" rx="36" fill="#f97316"/>
-
-  <!-- Stem 3 (right) -->
-  <rect x="374" y="188" width="72" height="230" rx="36" fill="#f97316"/>
+  <!-- Lowercase "m" in Fredoka Bold, centred -->
+  <text
+    x="256"
+    y="370"
+    font-family="Fredoka"
+    font-weight="700"
+    font-size="420"
+    fill="#f97316"
+    text-anchor="middle"
+  >m</text>
 </svg>
