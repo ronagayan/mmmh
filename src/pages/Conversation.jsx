@@ -30,6 +30,7 @@ export default function Conversation() {
   const [sending, setSending] = useState(false)
   const [loading, setLoading] = useState(true)
   const [e2eReady, setE2eReady] = useState(false)
+  const [sendError, setSendError] = useState(null)
 
   // Ref so the realtime callback always sees the current shared key
   const sharedKeyRef = useRef(null)
@@ -45,7 +46,11 @@ export default function Conversation() {
         { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${id}` },
         async (payload) => {
           const msg = await tryDecrypt(sharedKeyRef.current, payload.new)
-          setMessages((prev) => [...prev, msg])
+          // Deduplicate: replace optimistic message if same id, else append
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === msg.id)) return prev
+            return [...prev, msg]
+          })
           setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
         },
       )
@@ -103,20 +108,47 @@ export default function Conversation() {
   const handleSend = async (e) => {
     e.preventDefault()
     if (!text.trim()) return
+    setSendError(null)
     setSending(true)
 
     const sk = sharedKeyRef.current
+    const displayText = text.trim()
     const payload = sk
-      ? { text: await encryptMessage(sk, text.trim()), encrypted: true }
-      : { text: text.trim(), encrypted: false }
+      ? { text: await encryptMessage(sk, displayText), encrypted: true }
+      : { text: displayText, encrypted: false }
 
-    await supabase.from('messages').insert({
+    // Optimistic update — show immediately on sender's side
+    const tempId = `temp-${Date.now()}`
+    const optimistic = {
+      id: tempId,
+      conversation_id: id,
+      sender_id: user.id,
+      created_at: new Date().toISOString(),
+      post_id: null,
+      display: displayText,
+      ...payload,
+    }
+    setMessages((prev) => [...prev, optimistic])
+    setText('')
+    setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), 50)
+
+    const { data, error } = await supabase.from('messages').insert({
       conversation_id: id,
       sender_id: user.id,
       ...payload,
-    })
+    }).select().single()
 
-    setText('')
+    if (error) {
+      // Revert optimistic message and show error
+      setMessages((prev) => prev.filter((m) => m.id !== tempId))
+      setText(displayText)
+      setSendError('Failed to send — check your connection')
+    } else if (data) {
+      // Replace temp with real message (realtime may also arrive; dedup handles it)
+      const real = { ...data, display: displayText }
+      setMessages((prev) => prev.map((m) => m.id === tempId ? real : m))
+    }
+
     setSending(false)
   }
 
@@ -207,6 +239,11 @@ export default function Conversation() {
         })}
         <div ref={bottomRef} />
       </div>
+
+      {/* Send error */}
+      {sendError && (
+        <p className="text-xs text-red-400 text-center py-1">{sendError}</p>
+      )}
 
       {/* Input */}
       <form onSubmit={handleSend} className="flex gap-2 pt-3 border-t border-white/5">
