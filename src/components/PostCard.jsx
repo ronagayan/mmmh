@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import RatingSlider from './RatingSlider'
 import MemRating from './MemRating'
 import Comments from './Comments'
 import RecipeEditor from './RecipeEditor'
+import SharePostModal from './SharePostModal'
 import { useAuth } from '../context/AuthContext'
 import { usePrefs } from '../context/PrefsContext'
 import { supabase } from '../lib/supabase'
@@ -52,6 +54,7 @@ function RecipeCard({ raw }) {
 }
 
 export default function PostCard({ post, onRated, onCommented, onDeleted, index = 0 }) {
+  const navigate = useNavigate()
   const { user, isAdmin } = useAuth()
   const { lang } = usePrefs()
   const mem = lang === 'he' ? 'מ' : 'm'
@@ -65,6 +68,7 @@ export default function PostCard({ post, onRated, onCommented, onDeleted, index 
     try { return JSON.parse(post.caption.slice(RECIPE_PREFIX.length)) } catch { return null }
   })
   const [saving, setSaving] = useState(false)
+  const [shareOpen, setShareOpen] = useState(false)
   const menuRef = useRef(null)
 
   const myRating = post.ratings?.find((r) => r.user_id === user?.id)
@@ -102,6 +106,7 @@ export default function PostCard({ post, onRated, onCommented, onDeleted, index 
   }
 
   return (
+    <>
     <div
       className="bg-slate-900/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/5 card-lift opacity-0 animate-fade-in-up"
       style={{ animationDelay: `${index * 0.08}s` }}
@@ -121,15 +126,20 @@ export default function PostCard({ post, onRated, onCommented, onDeleted, index 
       <div className="p-4 space-y-3">
         {/* Author + timestamp + menu */}
         <div className="flex items-center gap-2">
-          {post.author_avatar && (
-            <img
-              src={post.author_avatar}
-              alt=""
-              className="w-6 h-6 rounded-full ring-1 ring-white/10"
-              referrerPolicy="no-referrer"
-            />
-          )}
-          <span className="text-sm font-semibold text-slate-200">{post.author_name}</span>
+          <button
+            onClick={() => navigate(post.user_id === user?.id ? '/profile' : `/u/${post.user_id}`)}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            {post.author_avatar && (
+              <img
+                src={post.author_avatar}
+                alt=""
+                className="w-6 h-6 rounded-full ring-1 ring-white/10"
+                referrerPolicy="no-referrer"
+              />
+            )}
+            <span className="text-sm font-semibold text-slate-200">{post.author_name}</span>
+          </button>
           <span className="text-xs text-slate-600 ml-auto">
             {new Date(post.created_at).toLocaleDateString()}
           </span>
@@ -221,8 +231,19 @@ export default function PostCard({ post, onRated, onCommented, onDeleted, index 
           </div>
         )}
 
-        {/* Divider */}
-        <div className="border-t border-white/5" />
+        {/* Divider + share */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 border-t border-white/5" />
+          <button
+            onClick={() => setShareOpen(true)}
+            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-brand-400 transition-colors py-0.5"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+            Share
+          </button>
+        </div>
 
         {/* Comments */}
         <Comments
@@ -232,5 +253,8 @@ export default function PostCard({ post, onRated, onCommented, onDeleted, index 
         />
       </div>
     </div>
+
+    {shareOpen && <SharePostModal post={post} onClose={() => setShareOpen(false)} />}
+  </>
   )
 }

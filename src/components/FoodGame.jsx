@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 
 // ── Constants ──────────────────────────────────────────────────────────────
 const FOODS    = ['🍕','🍔','🌮','🍜','🍣','🍩','🍰','🥗','🌯','🍦','🥩','🥐','🍇','🍓','🫐','🥨','🧇','🍱']
@@ -22,19 +24,23 @@ function getTier(elapsed) {
 }
 
 // ── Leaderboard helpers ────────────────────────────────────────────────────
-const LB_KEY = 'mmmh_food_leaderboard'
 const HS_KEY = 'mmmh_food_game_hs'
 
-function loadBoard()    { try { return JSON.parse(localStorage.getItem(LB_KEY) || '[]') } catch { return [] } }
-function loadHS()       { try { return parseInt(localStorage.getItem(HS_KEY) || '0', 10) } catch { return 0 } }
-function saveHS(s)      { try { localStorage.setItem(HS_KEY, String(s)) } catch {} }
+function loadHS()  { try { return parseInt(localStorage.getItem(HS_KEY) || '0', 10) } catch { return 0 } }
+function saveHS(s) { try { localStorage.setItem(HS_KEY, String(s)) } catch {} }
 
-function addEntry(name, score) {
-  const id    = Date.now()
-  const entry = { id, name: (name.trim() || 'Anonymous'), score, date: new Date().toLocaleDateString() }
-  const board = [...loadBoard(), entry].sort((a, b) => b.score - a.score).slice(0, 10)
-  try { localStorage.setItem(LB_KEY, JSON.stringify(board)) } catch {}
-  return { board, newIdx: board.findIndex(e => e.id === id) }
+async function fetchBoard() {
+  const { data } = await supabase
+    .from('game_scores')
+    .select('id, player_name, score, created_at')
+    .order('score', { ascending: false })
+    .limit(10)
+  return (data || []).map(e => ({
+    id: e.id,
+    name: e.player_name,
+    score: e.score,
+    date: new Date(e.created_at).toLocaleDateString(),
+  }))
 }
 
 // ── Grid helpers ───────────────────────────────────────────────────────────
@@ -43,6 +49,7 @@ const emptyGrid = () =>
 
 // ══════════════════════════════════════════════════════════════════════════
 export default function FoodGame({ onClose }) {
+  const { user } = useAuth()
   // ── UI state ─────────────────────────────────────────────────────────
   const [phase,        setPhase]        = useState('idle')  // idle|countdown|playing|over
   const [countdown,    setCountdown]    = useState(3)
@@ -75,6 +82,9 @@ export default function FoodGame({ onClose }) {
 
   phaseRef.current = phase
 
+  // Load leaderboard on first open
+  useEffect(() => { fetchBoard().then(setBoard) }, [])
+
   // ── Cleanup ───────────────────────────────────────────────────────────
   const clearAll = useCallback(() => {
     Object.values(cellTimers.current).forEach(clearTimeout)
@@ -94,7 +104,7 @@ export default function FoodGame({ onClose }) {
     setCells(emptyGrid())
     setPhase('over')
     setOverSub('entry')
-    setBoard(loadBoard())
+    fetchBoard().then(setBoard)
   }, [clearAll])
 
   // ── Spawn one item with given difficulty params ───────────────────────
@@ -218,10 +228,17 @@ export default function FoodGame({ onClose }) {
   }
 
   // ── Submit leaderboard entry ──────────────────────────────────────────
-  const submitEntry = () => {
-    const { board: b, newIdx: ni } = addEntry(nameInput, score)
+  const submitEntry = async () => {
+    const name = nameInput.trim() || 'Anonymous'
+    const { data } = await supabase
+      .from('game_scores')
+      .insert({ user_id: user?.id ?? null, player_name: name, score })
+      .select('id')
+      .single()
+    const newId = data?.id
+    const b = await fetchBoard()
     setBoard(b)
-    setNewIdx(ni)
+    setNewIdx(b.findIndex(e => e.id === newId))
     setOverSub('board')
   }
 
@@ -316,10 +333,10 @@ export default function FoodGame({ onClose }) {
                 </button>
 
                 {/* Leaderboard peek */}
-                {loadBoard().length > 0 && (
+                {board.length > 0 && (
                   <div className="space-y-1">
                     <p className="text-xs text-slate-600 text-center">Top scores</p>
-                    {loadBoard().slice(0, 3).map((e, i) => (
+                    {board.slice(0, 3).map((e, i) => (
                       <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/4">
                         <span className="text-sm">{i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}</span>
                         <span className="flex-1 text-sm text-slate-300 truncate">{e.name}</span>

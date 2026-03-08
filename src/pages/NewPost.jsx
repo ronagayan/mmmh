@@ -40,6 +40,9 @@ export default function NewPost() {
   const [validating, setValidating] = useState(false)
   const [foodError, setFoodError] = useState('')
 
+  // Visibility
+  const [visibility, setVisibility] = useState('public')
+
   // Recipe state
   const [recipe, setRecipe] = useState({
     name: '',
@@ -99,6 +102,7 @@ export default function NewPost() {
         user_id: user.id,
         image_url: publicUrl,
         caption: finalCaption,
+        visibility,
       })
 
     if (postError) {
@@ -136,6 +140,28 @@ export default function NewPost() {
           >
             {label}
             <span className={`text-xs font-normal ${mode === id ? 'text-orange-100/70' : 'text-slate-700'}`}>{sub}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Visibility picker */}
+      <div className="flex gap-2">
+        {[
+          { id: 'public', label: '🌍 Public', sub: 'everyone' },
+          { id: 'followers', label: '🔒 Followers', sub: 'only' },
+        ].map(({ id, label, sub }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setVisibility(id)}
+            className={`flex-1 py-2 rounded-xl border text-sm font-semibold transition-all duration-200 flex flex-col items-center gap-0.5 ${
+              visibility === id
+                ? 'bg-brand-500/15 border-brand-500/50 text-brand-400'
+                : 'bg-white/3 border-white/8 text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            {label}
+            <span className={`text-xs font-normal ${visibility === id ? 'text-brand-400/70' : 'text-slate-700'}`}>{sub}</span>
           </button>
         ))}
       </div>

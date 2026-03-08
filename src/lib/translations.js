@@ -2,6 +2,7 @@ const TRANSLATIONS = {
   en: {
     // Nav labels
     nav_feed:    'Feed',
+    nav_explore: 'Explore',
     nav_post:    'Post',
     nav_chat:    'Chat',
     nav_profile: 'Profile',
@@ -48,6 +49,7 @@ const TRANSLATIONS = {
   he: {
     // Nav labels
     nav_feed:    'פיד',
+    nav_explore: 'גלה',
     nav_post:    'פרסם',
     nav_chat:    'צ\'אט',
     nav_profile: 'פרופיל',

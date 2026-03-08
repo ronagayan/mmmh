@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
+import PostSharePreview from '../components/PostSharePreview'
 import {
   getOrCreateKeyPair,
   deriveSharedKey,
@@ -188,13 +189,18 @@ export default function Conversation() {
               className={`flex animate-fade-in ${isMine ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[75%] px-3.5 py-2 rounded-2xl text-sm leading-snug ${
-                  isMine
-                    ? 'bg-brand-500 text-white rounded-br-md shadow-lg shadow-brand-500/20'
-                    : 'bg-white/8 text-slate-200 rounded-bl-md border border-white/5'
-                } ${isUndecryptable ? 'italic opacity-40' : ''}`}
+                className={`max-w-[75%] rounded-2xl text-sm leading-snug ${
+                  msg.post_id
+                    ? 'p-0 overflow-hidden bg-transparent border-0 shadow-none'
+                    : `px-3.5 py-2 ${isMine
+                        ? 'bg-brand-500 text-white rounded-br-md shadow-lg shadow-brand-500/20'
+                        : 'bg-white/8 text-slate-200 rounded-bl-md border border-white/5'
+                      } ${isUndecryptable ? 'italic opacity-40' : ''}`
+                }`}
               >
-                {msg.display}
+                {msg.post_id
+                  ? <PostSharePreview postId={msg.post_id} />
+                  : msg.display}
               </div>
             </div>
           )
