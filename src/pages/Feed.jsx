@@ -27,7 +27,7 @@ export default function Feed() {
     // Fetch comments for all posts
     const { data: commentsData } = await supabase
       .from('comments')
-      .select('*, profiles(display_name)')
+      .select('id, post_id, user_id, text, created_at, profiles(display_name)')
       .in('post_id', postIds)
       .order('created_at', { ascending: true })
 
@@ -53,7 +53,11 @@ export default function Feed() {
       comments: (commentsData || [])
         .filter((c) => c.post_id === post.id)
         .map((c) => ({
-          ...c,
+          id: c.id,
+          post_id: c.post_id,
+          user_id: c.user_id,
+          text: c.text,
+          created_at: c.created_at,
           user_name: c.profiles?.display_name || 'Anonymous',
         })),
     }))
@@ -106,6 +110,7 @@ export default function Feed() {
           index={i}
           onRated={fetchPosts}
           onCommented={fetchPosts}
+          onDeleted={(id) => setPosts(ps => ps.filter(p => p.id !== id))}
         />
       ))}
     </div>

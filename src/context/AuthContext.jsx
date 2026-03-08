@@ -7,6 +7,7 @@ const AuthContext = createContext({})
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -20,6 +21,12 @@ export function AuthProvider({ children }) {
 
     return () => subscription.unsubscribe()
   }, [])
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return }
+    supabase.from('profiles').select('is_admin').eq('id', user.id).single()
+      .then(({ data }) => setIsAdmin(data?.is_admin ?? false))
+  }, [user])
 
   // When a user logs in, ensure their public key is in the DB so others can
   // derive the shared E2E encryption key for conversations with them.
@@ -41,7 +48,7 @@ export function AuthProvider({ children }) {
       .catch(() => {}) // non-fatal — messages fall back to unencrypted
   }, [user])
 
-  const redirectTo = window.location.origin + (import.meta.env.PROD ? '/mmmh/' : '/')
+  const redirectTo = window.location.origin + '/'
 
   const signInWithGoogle = () => {
     return supabase.auth.signInWithOAuth({
@@ -63,7 +70,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut }}>
+    <AuthContext.Provider value={{ user, loading, isAdmin, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut }}>
       {children}
     </AuthContext.Provider>
   )
