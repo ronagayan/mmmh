@@ -66,15 +66,20 @@ export default function SharePostModal({ post, onClose }) {
   }
 
   const share = async (convId) => {
-    await supabase.from('messages').insert({
+    const { error } = await supabase.from('messages').insert({
       conversation_id: convId,
       sender_id: user.id,
       post_id: post.id,
-      text: null,
+      text: '',
       encrypted: false,
     })
-    setSent(convId)
-    setTimeout(onClose, 1200)
+    if (!error) {
+      setSent(convId)
+      setTimeout(onClose, 1200)
+    } else {
+      console.error('Share failed:', error)
+      alert(`Share failed: ${error.code} — ${error.message}`)
+    }
   }
 
   const shareToUser = async (otherUserId) => {
