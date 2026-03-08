@@ -11,31 +11,31 @@
 
   <!--
     Bold lowercase "m" — path-based (no font required).
-    3 pill stems + 2 quadratic-Bézier arches.
+    3 pill stems + 2 cubic-Bézier arches (round humps, not pointed).
 
-    Stem width : 72 px (rx=36)
-    Gap        : 82 px
-    Total width: 3×72 + 2×82 = 380 px  → left x = 66
-    Stem tops  : y = 172
-    Stem bottoms: y = 406  (height 234 px)
-    Arch ctrl  : y = 80
+    Stem width  : 72 px  (rx=36 → fully semicircular top/bottom)
+    Gap         : 82 px
+    Total width : 3×72 + 2×82 = 380 px  → left x = 66
     Stem centers: x = 102, 256, 410
+    Stem tops   : y = 188
+    Stem bottoms: y = 418  (height 230 px)
+    Arch handles: y = 108  (80 px above stem tops → smooth round hump)
   -->
 
-  <!-- Left arch -->
-  <path d="M 102,172 Q 179,80 256,172"
+  <!-- Left arch — cubic Bézier with vertical handles = round hump -->
+  <path d="M 102,188 C 102,108 256,108 256,188"
         stroke="#f97316" stroke-width="72" stroke-linecap="round" fill="none"/>
 
   <!-- Right arch -->
-  <path d="M 256,172 Q 333,80 410,172"
+  <path d="M 256,188 C 256,108 410,108 410,188"
         stroke="#f97316" stroke-width="72" stroke-linecap="round" fill="none"/>
 
   <!-- Stem 1 (left) -->
-  <rect x="66"  y="172" width="72" height="234" rx="36" fill="#f97316"/>
+  <rect x="66"  y="188" width="72" height="230" rx="36" fill="#f97316"/>
 
   <!-- Stem 2 (middle) -->
-  <rect x="220" y="172" width="72" height="234" rx="36" fill="#f97316"/>
+  <rect x="220" y="188" width="72" height="230" rx="36" fill="#f97316"/>
 
   <!-- Stem 3 (right) -->
-  <rect x="374" y="172" width="72" height="234" rx="36" fill="#f97316"/>
+  <rect x="374" y="188" width="72" height="230" rx="36" fill="#f97316"/>
 </svg>
