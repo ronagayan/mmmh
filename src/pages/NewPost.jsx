@@ -6,17 +6,15 @@ import RecipeEditor from '../components/RecipeEditor'
 
 async function validateFood(file) {
   try {
-    const base64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result.split(',')[1])
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
-    const { data, error } = await supabase.functions.invoke('validate-food', {
-      body: { imageBase64: base64, mimeType: file.type },
-    })
-    if (error) return true
-    return data.isFood
+    const res = await fetch(
+      'https://api-inference.huggingface.co/models/Kaludi/food-not-food-image-classification',
+      { method: 'POST', body: file }
+    )
+    if (!res.ok) return true
+    const result = await res.json()
+    if (!Array.isArray(result)) return true
+    const food = result.find((r) => r.label === 'Food')
+    return food ? food.score > 0.6 : false
   } catch {
     return true
   }
