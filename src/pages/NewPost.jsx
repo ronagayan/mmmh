@@ -27,9 +27,10 @@ async function classifyImage(file) {
   const food = items.find((r) => r.label?.toLowerCase() === 'food')
   const notFood = items.find((r) => r.label?.toLowerCase().includes('not'))
 
-  if (food) return food.score > 0.5
-  if (notFood) return notFood.score < 0.5
-  return items[0]?.label?.toLowerCase().includes('food') ?? false
+  // Only block if model is confidently "Not Food" (score > 0.75)
+  if (notFood && notFood.score > 0.75) return false
+  // Otherwise allow — food detected, ambiguous, or low confidence
+  return true
 }
 
 async function validateFood(file, onStatus) {
@@ -42,11 +43,11 @@ async function validateFood(file, onStatus) {
         await new Promise((r) => setTimeout(r, RETRY_DELAY * (attempt + 1)))
         continue
       }
-      // On final failure, block the upload to be safe
-      return false
+      // On error, allow upload — only block when model says "not food"
+      return true
     }
   }
-  return false
+  return true
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
