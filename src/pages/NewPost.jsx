@@ -10,11 +10,23 @@ async function validateFood(file) {
       'https://api-inference.huggingface.co/models/Kaludi/food-not-food-image-classification',
       { method: 'POST', body: file }
     )
-    if (!res.ok) return true
+    if (!res.ok) return true // network error → allow
     const result = await res.json()
+
+    // Model still loading: {"error": "...", "estimated_time": N}
     if (!Array.isArray(result)) return true
-    const food = result.find((r) => r.label === 'Food')
-    return food ? food.score > 0.6 : false
+
+    // HuggingFace image classification returns [[{label, score}, ...]]
+    const items = Array.isArray(result[0]) ? result[0] : result
+    if (!items.length) return true
+
+    const food = items.find((r) => r.label?.toLowerCase() === 'food')
+    const notFood = items.find((r) => r.label?.toLowerCase().includes('not'))
+
+    if (food) return food.score > 0.5
+    if (notFood) return notFood.score < 0.5
+    // Fallback: top label contains "food"
+    return items[0]?.label?.toLowerCase().includes('food') ?? true
   } catch {
     return true
   }
