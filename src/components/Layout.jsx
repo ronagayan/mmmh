@@ -34,7 +34,22 @@ export default function Layout() {
   const clickCountRef = useRef(0)
   const clickTimerRef = useRef(null)
   const [logoFlash, setLogoFlash] = useState(false)
+  const [logoShake, setLogoShake] = useState(false)
   const [clickProgress, setClickProgress] = useState(0) // 0–7
+
+  // Periodic logo shake every 8–18 seconds
+  useEffect(() => {
+    let timer
+    const schedule = () => {
+      timer = setTimeout(() => {
+        setLogoShake(true)
+        setTimeout(() => setLogoShake(false), 600)
+        schedule()
+      }, 8000 + Math.random() * 10000)
+    }
+    schedule()
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleLogoClick = useCallback((e) => {
     e.preventDefault() // prevent nav on repeated clicks
@@ -75,6 +90,7 @@ export default function Layout() {
 
           {/* Logo — clickable easter egg */}
           <div className="relative">
+            <span className={logoShake ? 'logo-shake' : ''} style={{ display: 'inline-block' }}>
             <button
               type="button"
               onClick={handleLogoClick}
@@ -90,6 +106,7 @@ export default function Layout() {
             >
               mmmh
             </button>
+            </span>
 
             {/* Progress dots — only show after first click */}
             {clickProgress > 0 && (
