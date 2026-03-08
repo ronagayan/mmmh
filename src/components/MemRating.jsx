@@ -26,7 +26,7 @@ export default function MemRating({ ratings }) {
         {netCount > 0 ? (
           <span className="text-brand-400">{netText}</span>
         ) : (
-          <span className="text-red-400 text-base">({totalRating} מ)</span>
+          <span className="text-red-400">🤮{'מ'.repeat(Math.abs(totalRating))}</span>
         )}
       </div>
 

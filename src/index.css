@@ -33,6 +33,33 @@
   --border-input:   rgba(0, 0, 0, 0.10);
 }
 
+/* ── Day mode contrast overrides ─────────────────────────── */
+/* Cards */
+[data-theme="day"] .bg-slate-900\/60 {
+  background-color: rgba(255, 255, 255, 0.82) !important;
+}
+[data-theme="day"] .bg-\[\#0d1525\],
+[data-theme="day"] .bg-slate-800 {
+  background-color: #f5ede2 !important;
+}
+/* Borders */
+[data-theme="day"] .border-white\/5  { border-color: rgba(0,0,0,0.08) !important; }
+[data-theme="day"] .border-white\/8  { border-color: rgba(0,0,0,0.10) !important; }
+[data-theme="day"] .border-white\/10 { border-color: rgba(0,0,0,0.12) !important; }
+/* Text */
+[data-theme="day"] .text-slate-100 { color: #1c1917 !important; }
+[data-theme="day"] .text-slate-200 { color: #292524 !important; }
+[data-theme="day"] .text-slate-300 { color: #44403c !important; }
+[data-theme="day"] .text-slate-400 { color: #57534e !important; }
+[data-theme="day"] .text-slate-500 { color: #78716c !important; }
+[data-theme="day"] .text-slate-600 { color: #a8a29e !important; }
+[data-theme="day"] .text-slate-700 { color: #d6d3d1 !important; }
+/* Inputs & form elements */
+[data-theme="day"] .bg-white\/5  { background-color: rgba(0,0,0,0.05) !important; }
+[data-theme="day"] .bg-white\/8  { background-color: rgba(0,0,0,0.07) !important; }
+[data-theme="day"] .bg-white\/3  { background-color: rgba(0,0,0,0.03) !important; }
+[data-theme="day"] .placeholder-slate-600::placeholder { color: #a8a29e !important; }
+
 body {
   font-family: 'Fredoka', sans-serif;
   background-color: var(--bg-page-base);

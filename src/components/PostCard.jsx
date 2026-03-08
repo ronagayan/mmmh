@@ -5,6 +5,50 @@ import Comments from './Comments'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 
+const RECIPE_PREFIX = '__recipe__'
+
+function RecipeCard({ raw }) {
+  let recipe
+  try { recipe = JSON.parse(raw) } catch { return <p className="text-slate-300 leading-snug">{RECIPE_PREFIX}{raw}</p> }
+
+  return (
+    <div className="rounded-xl border border-white/8 bg-white/3 p-3 space-y-3 text-sm">
+      {recipe.name && (
+        <p className="font-semibold text-slate-100 text-base">🍳 {recipe.name}</p>
+      )}
+      {recipe.ingredients?.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Ingredients</p>
+          <ul className="space-y-1">
+            {recipe.ingredients.map((ing, i) => (
+              <li key={i} className="flex justify-between text-slate-300">
+                <span>{ing.name}</span>
+                {ing.amount && <span className="text-slate-500">{ing.amount}</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {recipe.steps?.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Steps</p>
+          <ol className="space-y-1.5">
+            {recipe.steps.map((step, i) => (
+              <li key={i} className="flex gap-2 text-slate-300">
+                <span className="shrink-0 w-5 h-5 rounded-full bg-brand-500/15 border border-brand-500/30 flex items-center justify-center text-xs font-bold text-brand-400">{i + 1}</span>
+                <span className="leading-snug">{step}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+      {recipe.notes && (
+        <p className="text-slate-500 text-xs italic border-t border-white/5 pt-2">{recipe.notes}</p>
+      )}
+    </div>
+  )
+}
+
 export default function PostCard({ post, onRated, onCommented, onDeleted, index = 0 }) {
   const { user, isAdmin } = useAuth()
   const [showRating, setShowRating] = useState(false)
@@ -132,9 +176,11 @@ export default function PostCard({ post, onRated, onCommented, onDeleted, index 
               </button>
             </div>
           </div>
-        ) : (
-          post.caption && <p className="text-slate-300 leading-snug">{post.caption}</p>
-        )}
+        ) : post.caption ? (
+          post.caption.startsWith(RECIPE_PREFIX)
+            ? <RecipeCard raw={post.caption.slice(RECIPE_PREFIX.length)} />
+            : <p className="text-slate-300 leading-snug">{post.caption}</p>
+        ) : null}
 
         {/* Ratings */}
         <MemRating ratings={post.ratings} />
