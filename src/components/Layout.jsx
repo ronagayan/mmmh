@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import FoodGame from './FoodGame'
 import OnboardingGuide, { hasSeenOnboarding } from './OnboardingGuide'
 import InstallPWA from './InstallPWA'
+import WhatsNewModal, { hasSeenWhatsNew } from './WhatsNewModal'
 
 export default function Layout() {
   const { user, signOut } = useAuth()
@@ -13,6 +14,7 @@ export default function Layout() {
   const location = useLocation()
   const [showGame, setShowGame] = useState(false)
   const [showOnboarding, setShowOnboarding] = useState(!hasSeenOnboarding())
+  const [showWhatsNew, setShowWhatsNew] = useState(!hasSeenWhatsNew())
 
   // ── Header avatar — refetch on route change so profile edits reflect ─────
   const [headerAvatar, setHeaderAvatar] = useState(user?.user_metadata?.avatar_url ?? '')
@@ -279,6 +281,11 @@ export default function Layout() {
 
       {/* First-use onboarding (full screen, above everything except game) */}
       {showOnboarding && <OnboardingGuide onDone={() => setShowOnboarding(false)} />}
+
+      {/* What's New modal */}
+      {showWhatsNew && !showOnboarding && (
+        <WhatsNewModal onClose={() => setShowWhatsNew(false)} />
+      )}
 
       {/* Add to Home Screen prompt */}
       <InstallPWA />
