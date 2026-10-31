@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:scrollbars="none">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+
+        <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/emulate_title" android:textSize="24sp" />
+        <TextView style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/emulate_subtitle" android:layout_marginBottom="12dp" />
+
+        <LinearLayout android:id="@+id/emu_status_card" style="@style/Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:gravity="center">
+            <FrameLayout android:layout_width="120dp" android:layout_height="120dp">
+                <View android:id="@+id/emu_pulse" android:layout_width="120dp" android:layout_height="120dp" android:background="@drawable/circle_ring" />
+                <FrameLayout android:id="@+id/emu_circle" android:layout_width="88dp" android:layout_height="88dp" android:layout_gravity="center" android:background="@drawable/circle_primary">
+                    <ImageView android:layout_width="52dp" android:layout_height="52dp" android:layout_gravity="center" android:src="@drawable/ic_nfc_big" android:contentDescription="@string/emulate_title" />
+                </FrameLayout>
+            </FrameLayout>
+            <TextView android:id="@+id/emu_status" style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp" />
+            <TextView android:id="@+id/emu_status_detail" style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center" android:layout_marginTop="4dp" />
+            <Button android:id="@+id/emu_toggle" style="@style/ButtonPrimary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="@string/start_emulation" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/emulated_content" />
+            <TextView android:id="@+id/emu_size" style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" />
+            <LinearLayout android:id="@+id/emu_records" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="8dp" />
+            <TextView android:id="@+id/emu_empty" style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/emu_no_records" android:layout_marginTop="4dp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="10dp">
+                <Button android:id="@+id/emu_add" style="@style/ButtonSecondary" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/add_record" android:layout_marginEnd="4dp" />
+                <Button android:id="@+id/emu_use_last" style="@style/ButtonSecondary" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/use_last_scan" android:layout_marginStart="4dp" />
+            </LinearLayout>
+            <CheckBox android:id="@+id/emu_writable" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/emu_writable" />
+            <TextView style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/emu_writable_hint" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                <TextView style="@style/CardTitle" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/emu_activity" />
+                <Button android:id="@+id/emu_clear_log" style="@style/ButtonSecondary" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minHeight="36dp" android:text="@string/clear" />
+            </LinearLayout>
+            <TextView android:id="@+id/emu_stats" style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" />
+            <TextView android:id="@+id/emu_log" style="@style/Mono" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textIsSelectable="true" android:text="" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

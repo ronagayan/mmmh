@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical" android:gravity="center" android:padding="24dp">
+    <FrameLayout android:layout_width="120dp" android:layout_height="120dp">
+        <View android:id="@+id/scan_pulse" android:layout_width="120dp" android:layout_height="120dp" android:background="@drawable/circle_ring" />
+        <FrameLayout android:layout_width="88dp" android:layout_height="88dp" android:layout_gravity="center" android:background="@drawable/circle_primary">
+            <ImageView android:layout_width="52dp" android:layout_height="52dp" android:layout_gravity="center" android:src="@drawable/ic_nfc_big" android:contentDescription="@string/approach_tag" />
+        </FrameLayout>
+    </FrameLayout>
+    <TextView android:id="@+id/scan_title" style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/approach_tag" />
+    <TextView android:id="@+id/scan_message" style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center" android:layout_marginTop="6dp" />
+    <TextView android:id="@+id/scan_result" style="@style/Body" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:layout_marginTop="12dp" android:visibility="gone" android:textIsSelectable="true" />
+    <TextView android:id="@+id/scan_counter" style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:visibility="gone" />
+</LinearLayout>

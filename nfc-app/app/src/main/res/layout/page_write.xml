@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true" android:scrollbars="none">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+
+        <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/write_title" android:textSize="24sp" android:layout_marginBottom="12dp" />
+
+        <LinearLayout style="@style/Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/records_to_write" />
+            <TextView android:id="@+id/write_size" style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" />
+            <LinearLayout android:id="@+id/write_records" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="8dp" />
+            <TextView android:id="@+id/write_empty" style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/no_records_yet" android:layout_marginTop="4dp" />
+            <Button android:id="@+id/write_add" style="@style/ButtonSecondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="@string/add_record" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <CheckBox android:id="@+id/write_lock" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/lock_after_write" />
+            <CheckBox android:id="@+id/write_bulk" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/bulk_mode" />
+            <Button android:id="@+id/write_go" style="@style/ButtonPrimary" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/write_to_tag" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tag_operations" />
+            <TextView style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tag_operations_hint" android:layout_marginTop="2dp" android:layout_marginBottom="8dp" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                <Button android:id="@+id/op_erase" style="@style/ButtonSecondary" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/op_erase" android:layout_marginEnd="4dp" />
+                <Button android:id="@+id/op_format" style="@style/ButtonSecondary" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/op_format" android:layout_marginStart="4dp" />
+            </LinearLayout>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="8dp">
+                <Button android:id="@+id/op_clone" style="@style/ButtonSecondary" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/op_clone" android:layout_marginEnd="4dp" />
+                <Button android:id="@+id/op_lock" style="@style/ButtonDanger" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/op_lock" android:layout_marginStart="4dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

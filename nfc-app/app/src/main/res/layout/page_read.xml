@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:clipToPadding="false"
+    android:scrollbars="none">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="@string/read_title" android:textSize="24sp" android:layout_marginBottom="4dp" />
+        <TextView android:id="@+id/read_nfc_status" style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp" />
+
+        <LinearLayout android:id="@+id/read_idle_card" style="@style/Card"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:gravity="center" android:paddingTop="32dp" android:paddingBottom="32dp">
+            <FrameLayout android:layout_width="140dp" android:layout_height="140dp">
+                <View android:id="@+id/read_pulse" android:layout_width="140dp" android:layout_height="140dp" android:background="@drawable/circle_ring" />
+                <FrameLayout android:layout_width="104dp" android:layout_height="104dp" android:layout_gravity="center" android:background="@drawable/circle_primary">
+                    <ImageView android:layout_width="64dp" android:layout_height="64dp" android:layout_gravity="center"
+                        android:src="@drawable/ic_nfc_big" android:contentDescription="@string/read_title" />
+                </FrameLayout>
+            </FrameLayout>
+            <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" android:text="@string/read_hint_title" />
+            <TextView style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" android:gravity="center" android:text="@string/read_hint_body" />
+            <Button android:id="@+id/read_enable_nfc" style="@style/ButtonSecondary" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="@string/open_nfc_settings" android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/read_results" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:visibility="gone">
+
+            <LinearLayout style="@style/Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                    <TextView style="@style/CardTitle" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/tag_info" />
+                    <TextView android:id="@+id/read_tag_type_chip" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:background="@drawable/bg_chip_primary" android:textColor="@color/on_primary" android:textSize="12sp" android:textStyle="bold"
+                        android:paddingStart="10dp" android:paddingEnd="10dp" android:paddingTop="4dp" android:paddingBottom="4dp" />
+                </LinearLayout>
+                <LinearLayout android:id="@+id/read_info_rows" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="8dp" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="12dp">
+                    <Button android:id="@+id/read_copy_uid" style="@style/ButtonSecondary" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/copy_uid" android:layout_marginEnd="6dp" />
+                    <Button android:id="@+id/read_share" style="@style/ButtonSecondary" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/share" android:layout_marginStart="6dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout style="@style/Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ndef_records" />
+                <TextView android:id="@+id/read_ndef_summary" style="@style/Caption" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" />
+                <LinearLayout android:id="@+id/read_records" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="8dp" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="8dp">
+                    <Button android:id="@+id/read_clone" style="@style/ButtonPrimary" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/clone_to_tag" android:layout_marginEnd="6dp" />
+                    <Button android:id="@+id/read_emulate" style="@style/ButtonSecondary" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="@string/emulate_this" android:layout_marginStart="6dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/read_dump_card" style="@style/Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+                <TextView style="@style/CardTitle" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/memory_dump" />
+                <TextView android:id="@+id/read_dump" style="@style/Mono" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textIsSelectable="true" />
+            </LinearLayout>
+
+            <Button android:id="@+id/read_again" style="@style/ButtonSecondary" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/scan_another" android:layout_marginBottom="16dp" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
+
+    <FrameLayout
+        android:id="@+id/pages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <include layout="@layout/page_read" android:id="@+id/page_read" />
+        <include layout="@layout/page_write" android:id="@+id/page_write" android:visibility="gone" />
+        <include layout="@layout/page_emulate" android:id="@+id/page_emulate" android:visibility="gone" />
+        <include layout="@layout/page_history" android:id="@+id/page_history" android:visibility="gone" />
+        <include layout="@layout/page_tools" android:id="@+id/page_tools" android:visibility="gone" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_nav"
+        android:elevation="8dp">
+
+        <LinearLayout android:id="@+id/nav_read" style="@style/NavItem">
+            <ImageView android:id="@+id/nav_read_icon" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_nfc" android:contentDescription="@string/tab_read" />
+            <TextView android:id="@+id/nav_read_label" style="@style/NavLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tab_read" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/nav_write" style="@style/NavItem">
+            <ImageView android:id="@+id/nav_write_icon" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_edit" android:contentDescription="@string/tab_write" />
+            <TextView android:id="@+id/nav_write_label" style="@style/NavLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tab_write" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/nav_emulate" style="@style/NavItem">
+            <ImageView android:id="@+id/nav_emulate_icon" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_emulate" android:contentDescription="@string/tab_emulate" />
+            <TextView android:id="@+id/nav_emulate_label" style="@style/NavLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tab_emulate" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/nav_history" style="@style/NavItem">
+            <ImageView android:id="@+id/nav_history_icon" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_history" android:contentDescription="@string/tab_history" />
+            <TextView android:id="@+id/nav_history_label" style="@style/NavLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tab_history" />
+        </LinearLayout>
+        <LinearLayout android:id="@+id/nav_tools" style="@style/NavItem">
+            <ImageView android:id="@+id/nav_tools_icon" android:layout_width="24dp" android:layout_height="24dp" android:src="@drawable/ic_tools" android:contentDescription="@string/tab_tools" />
+            <TextView android:id="@+id/nav_tools_label" style="@style/NavLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/tab_tools" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

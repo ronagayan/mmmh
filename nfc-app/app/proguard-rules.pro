@@ -1,0 +1,2 @@
+-keep class com.ronagayan.nfcmaster.HceService { *; }
+-keepclassmembers class * extends android.app.Activity { *; }
