@@ -27,6 +27,7 @@ class HceService : HostApduService() {
     }
 
     private var appSelected = false
+    private var legacyAid = false
     private var selectedFile = FILE_NONE
     private var readCounted = false
     private var writeBuffer: ByteArray? = null
@@ -41,7 +42,7 @@ class HceService : HostApduService() {
         val writable = Emulation.writable
         return byteArrayOf(
             0x00, 0x0F,                 // CCLEN
-            0x20,                       // mapping version 2.0
+            if (legacyAid) 0x10 else 0x20, // mapping version 1.0 / 2.0 depending on the selected AID
             0x00, 0xFF.toByte(),        // MLe
             0x00, 0xFF.toByte(),        // MLc
             0x04, 0x06,                 // NDEF file control TLV
@@ -70,6 +71,7 @@ class HceService : HostApduService() {
                         if (!appSelected) Emulation.addLog(getString(R.string.emu_reader_connected))
                         Emulation.emit(Emulation.EVT_READER, "connected")
                         appSelected = true
+                        legacyAid = aid.contentEquals(AID_V1)
                         selectedFile = FILE_NONE
                         SW_OK
                     } else {
@@ -120,7 +122,7 @@ class HceService : HostApduService() {
                 val lc = if (apdu.size >= 5) apdu[4].toInt() and 0xFF else 0
                 if (apdu.size < 5 + lc) return SW_WRONG_LENGTH
                 val data = apdu.copyOfRange(5, 5 + lc)
-                if (offset + lc > MAX_NDEF_FILE + 2) return SW_WRONG_P1P2
+                if (offset + lc > MAX_NDEF_FILE) return SW_WRONG_P1P2
                 var buf = writeBuffer ?: currentNdef().copyOf()
                 if (buf.size < offset + lc) buf = buf.copyOf(offset + lc)
                 System.arraycopy(data, 0, buf, offset, lc)
@@ -156,6 +158,7 @@ class HceService : HostApduService() {
             Emulation.emit(Emulation.EVT_READER, "disconnected")
         }
         appSelected = false
+        legacyAid = false
         selectedFile = FILE_NONE
         readCounted = false
         writeBuffer = null

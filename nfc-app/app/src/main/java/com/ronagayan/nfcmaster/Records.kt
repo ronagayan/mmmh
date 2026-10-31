@@ -151,7 +151,7 @@ object RecordPicker {
                 Field("lang", R.string.f_language, default = lang, required = false)
             )) { v -> build({ RecordBuilder.text(v["text"]!!, v["lang"]!!) }, ctx, onRecord) }
 
-            R.string.rt_uri -> Forms.show(ctx, title, listOf(Field("url", R.string.f_url, default = "https://", inputType = InputType.TYPE_TEXT_VARIATION_URI))) { v ->
+            R.string.rt_uri -> Forms.show(ctx, title, listOf(Field("url", R.string.f_url, default = "https://", inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI))) { v ->
                 build({ RecordBuilder.uri(v["url"]!!) }, ctx, onRecord)
             }
 
@@ -165,7 +165,7 @@ object RecordPicker {
             )) { v -> build({ RecordBuilder.sms(v["phone"]!!, v["body"]!!) }, ctx, onRecord) }
 
             R.string.rt_email -> Forms.show(ctx, title, listOf(
-                Field("to", R.string.f_email, inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS),
+                Field("to", R.string.f_email, inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS),
                 Field("subject", R.string.f_subject, required = false),
                 Field("body", R.string.f_body, required = false, multiline = true)
             )) { v -> build({ RecordBuilder.email(v["to"]!!, v["subject"]!!, v["body"]!!) }, ctx, onRecord) }
@@ -177,11 +177,11 @@ object RecordPicker {
             )) { v -> build({ RecordBuilder.wifi(v["ssid"]!!, v["pass"]!!, v["auth"]!!) }, ctx, onRecord) }
 
             R.string.rt_contact -> Forms.show(ctx, title, listOf(
-                Field("name", R.string.f_name, inputType = InputType.TYPE_TEXT_FLAG_CAP_WORDS),
+                Field("name", R.string.f_name, inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS),
                 Field("phone", R.string.f_phone, inputType = InputType.TYPE_CLASS_PHONE, required = false),
-                Field("email", R.string.f_email, inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, required = false),
+                Field("email", R.string.f_email, inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS, required = false),
                 Field("org", R.string.f_org, required = false),
-                Field("url", R.string.f_website, required = false, inputType = InputType.TYPE_TEXT_VARIATION_URI),
+                Field("url", R.string.f_website, required = false, inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI),
                 Field("note", R.string.f_note, required = false, multiline = true)
             )) { v -> build({ RecordBuilder.vcard(v["name"]!!, v["phone"]!!, v["email"]!!, v["org"]!!, v["url"]!!, v["note"]!!) }, ctx, onRecord) }
 
@@ -200,7 +200,7 @@ object RecordPicker {
             )) { v -> build({ RecordBuilder.bluetooth(v["mac"]!!, v["name"]!!) }, ctx, onRecord) }
 
             R.string.rt_smart_poster -> Forms.show(ctx, title, listOf(
-                Field("url", R.string.f_url, default = "https://", inputType = InputType.TYPE_TEXT_VARIATION_URI),
+                Field("url", R.string.f_url, default = "https://", inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI),
                 Field("title", R.string.f_title),
                 Field("lang", R.string.f_language, default = lang, required = false)
             )) { v -> build({ RecordBuilder.smartPoster(v["url"]!!, v["title"]!!, v["lang"]!!) }, ctx, onRecord) }

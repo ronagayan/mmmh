@@ -236,6 +236,7 @@ class EmulatePage(private val act: MainActivity) {
             if (composer.records.isEmpty() && !writable.isChecked) { Ui.toast(act, R.string.emu_need_content); return }
             Emulation.setContent(act, composer.message(), writable.isChecked)
             Emulation.setEnabled(act, true)
+            act.handler.postDelayed({ act.updatePreferredService() }, 600)
             Thread { History.add(act, HistoryEntry.fromMessage(act, History.KIND_EMULATED, composer.message(), null, "HCE")) }.start()
         }
         act.selectTab(MainActivity.TAB_EMULATE)
@@ -244,6 +245,11 @@ class EmulatePage(private val act: MainActivity) {
 
     fun onResume() {
         Emulation.listeners.add(listener)
+        // A message may have been received while the activity was paused: resync the composer.
+        syncing = true
+        composer.set(Emulation.message?.records?.toList() ?: emptyList())
+        writable.isChecked = Emulation.writable
+        syncing = false
         refresh()
     }
 

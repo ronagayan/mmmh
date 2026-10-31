@@ -270,8 +270,9 @@ object TagOps {
             }
             a.transceive(byteArrayOf(0xA2.toByte(), (cfg + 2).toByte()) + op.pwd)
             a.transceive(byteArrayOf(0xA2.toByte(), (cfg + 3).toByte(), op.pack[0], op.pack[1], 0, 0))
-            val access = (if (op.protectRead) 0x80 else 0x00).toByte()
-            a.transceive(byteArrayOf(0xA2.toByte(), (cfg + 1).toByte(), access, 0, 0, 0))
+            // keep AUTHLIM / NFC_CNT_EN / VCTID etc. from the current ACCESS page, only set PROT
+            val access = ((c0[4].toInt() and 0x7F) or (if (op.protectRead) 0x80 else 0x00)).toByte()
+            a.transceive(byteArrayOf(0xA2.toByte(), (cfg + 1).toByte(), access, c0[5], c0[6], c0[7]))
             a.transceive(byteArrayOf(0xA2.toByte(), cfg.toByte(), c0[0], c0[1], c0[2], op.startPage.toByte()))
             return OpResult(true, ctx.getString(R.string.password_set), ctx.getString(R.string.protected_hint, "0x%02X".format(op.startPage)))
         } finally {
@@ -289,7 +290,7 @@ object TagOps {
             if (pack == null || pack.size < 2) return OpResult(false, ctx.getString(R.string.auth_failed))
             val c0 = a.transceive(byteArrayOf(0x30, cfg.toByte()))
             a.transceive(byteArrayOf(0xA2.toByte(), cfg.toByte(), c0[0], c0[1], c0[2], 0xFF.toByte()))
-            a.transceive(byteArrayOf(0xA2.toByte(), (cfg + 1).toByte(), 0, 0, 0, 0))
+            a.transceive(byteArrayOf(0xA2.toByte(), (cfg + 1).toByte(), (c0[4].toInt() and 0x7F).toByte(), c0[5], c0[6], c0[7]))
             return OpResult(true, ctx.getString(R.string.password_removed), "PACK: " + Hex.encode(pack, " "))
         } finally {
             try { a.close() } catch (_: Exception) {}

@@ -197,7 +197,9 @@ object TagReader {
     }
 
     fun readDump(tag: Tag, ntag: NtagInfo?): String? {
-        MifareClassic.get(tag)?.let { return classicDump(it) }
+        // MIFARE Classic needs key authentication per sector, which can take a long time with
+        // unknown keys, so it is only dumped on demand from the Tools page.
+        if (MifareClassic.get(tag) != null) return null
         NfcV.get(tag)?.let { return nfcVDump(it) }
         val ul = MifareUltralight.get(tag)
         val a = NfcA.get(tag)

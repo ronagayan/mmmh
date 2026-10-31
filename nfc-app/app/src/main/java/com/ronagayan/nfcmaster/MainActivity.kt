@@ -41,6 +41,7 @@ class MainActivity : Activity() {
     private val executor = Executors.newSingleThreadExecutor()
 
     @Volatile var pendingOp: TagOp? = null
+    @Volatile private var intentReadInProgress = false
     private var scanDialog: ScanDialog? = null
     var lastDetails: TagDetails? = null
     var currentTab = TAB_READ
@@ -105,6 +106,7 @@ class MainActivity : Activity() {
             @Suppress("DEPRECATION")
             val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
             if (tag != null) {
+                intentReadInProgress = true
                 selectTab(TAB_READ)
                 onTag(tag)
             }
@@ -119,6 +121,7 @@ class MainActivity : Activity() {
         else registerReceiver(adapterReceiver, filter)
         updateNfcState()
         updateReaderMode()
+        updatePreferredService()
         applyKeepScreen()
         emulatePage.onResume()
         historyPage.refresh()
@@ -181,6 +184,7 @@ class MainActivity : Activity() {
 
     fun updateReaderMode() {
         val adapter = nfc ?: return
+        if (intentReadInProgress) return
         if (currentTab == TAB_EMULATE && pendingOp == null) {
             disableReader()
             return
@@ -203,7 +207,7 @@ class MainActivity : Activity() {
         readerActive = false
     }
 
-    private fun updatePreferredService() {
+    fun updatePreferredService() {
         val adapter = nfc ?: return
         if (!hasHce()) return
         try {
@@ -223,11 +227,18 @@ class MainActivity : Activity() {
                 val details = try {
                     TagReader.read(tag, Prefs.bool(this, Prefs.READ_DUMP, true))
                 } catch (e: Exception) {
-                    handler.post { Ui.toast(this, getString(R.string.read_failed, e.message ?: e.toString())) }
+                    handler.post {
+                        intentReadInProgress = false
+                        updateReaderMode()
+                        Ui.toast(this, getString(R.string.read_failed, e.message ?: e.toString()))
+                    }
                     return@execute
                 }
                 History.add(this, HistoryEntry.fromDetails(this, details))
                 handler.post {
+                    intentReadInProgress = false
+                    updateReaderMode()
+                    if (isFinishing || isDestroyed) return@post
                     Feedback.scanned(this)
                     lastDetails = details
                     if (currentTab != TAB_READ) selectTab(TAB_READ)
@@ -245,6 +256,7 @@ class MainActivity : Activity() {
                 }
                 if (result.tagDetails != null) lastDetails = result.tagDetails
                 handler.post {
+                    if (isFinishing || isDestroyed) return@post
                     Feedback.scanned(this)
                     scanDialog?.showResult(result)
                 }
